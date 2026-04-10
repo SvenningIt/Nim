@@ -93,7 +93,7 @@ buttons.add(numberOfElements)
 var btnShuffle = newButton("Shuffle")
 buttons.add(btnShuffle)
 
-var algorithmSelector = newComboBox(@["Bubble Sort", "Selection Sort", "Insertion Sort", "Shell Sort", "Merge Sort", "Quick Sort", "Stalin Sort", "Sven Sort", "Radix Sort", "Heap Sort"])
+var algorithmSelector = newComboBox(@["Bubble Sort", "Selection Sort", "Insertion Sort", "Shell Sort", "Merge Sort", "Quick Sort", "Stalin Sort", "Sven Sort", "Radix Sort", "Heap Sort", "Power Sort"])
 buttons.add(algorithmSelector)
 
 var btnStart = newButton("Start")
@@ -161,6 +161,8 @@ btnStart.onClick = proc(event: ClickEvent) =
             runVisualisatie(radixSort(getallen))
         of "Heap Sort":
             runVisualisatie(heapSort(getallen))
+        of "Power Sort":
+            runVisualisatie(powerSort(getallen))
         else:
             window.alert("Hoe heb je dit nu weer gedaan?") 
 

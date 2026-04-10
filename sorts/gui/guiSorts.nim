@@ -1,4 +1,4 @@
-import times
+import times, math
 
 var
     comparisons*: int = 0
@@ -239,3 +239,148 @@ iterator heapSort*(lijst: var seq[int]): int =
                 🤦‍♂️ = 🧒 
             else:
                 break
+
+proc calculatePower(s1, e1, s2, e2, n: int): int =
+    let m1 = (s1.float + e1.float) / 2.0
+    let m2 = (s2.float + e2.float) / 2.0
+    var a = m1 / n.float
+    var b = m2 / n.float
+    result = 0
+
+    while floor(a * 2.0) == floor(b * 2.0):
+        a = (a * 2.0) - floor(a * 2.0)
+        b = (b * 2.0) - floor(b * 2.0)
+        inc(result)
+
+iterator powerSort*(lijst: var seq[int]): int =
+  let n = lijst.len
+
+  var stack: seq[tuple[start, einde, power: int]] = @[]
+  var huidigeStart = 0
+
+  while huidigeStart < n:
+    var eindeRun = huidigeStart
+
+    if eindeRun < n - 1:
+      inc(eindeRun)
+      inc(comparisons)
+      if lijst[eindeRun] < lijst[huidigeStart]:
+        while eindeRun < n - 1 and lijst[eindeRun + 1] < lijst[eindeRun]:
+          inc(comparisons)
+          inc(eindeRun)
+
+        var a = huidigeStart
+        var b = eindeRun
+
+        while a < b:
+          swap(lijst[a], lijst[b])
+          inc(swaps)
+          yield a
+          inc(a)
+          dec(b)
+      else:
+        while eindeRun < n - 1 and lijst[eindeRun + 1] >= lijst[eindeRun]:
+          inc(comparisons)
+          inc(eindeRun)
+
+    let volgendeStart = eindeRun + 1
+
+    if stack.len > 0:
+      let p = calculatePower(stack[^1].start, stack[^1].einde, huidigeStart, eindeRun, n)
+      
+      while stack.len >= 1 and stack[^1].power >= p:
+        let rechts = (start: huidigeStart, einde: eindeRun)
+        let links = stack.pop()
+        
+        var linksDeel = lijst[links.start..links.einde]
+        var rechtsDeel = lijst[rechts.start..rechts.einde]
+        var i = 0
+        var j = 0
+        var k = links.start
+        
+        while i < linksDeel.len and j < rechtsDeel.len:
+            inc(comparisons)
+            let v = if linksDeel[i] <= rechtsDeel[j]:
+                        let val = linksDeel[i]
+                        inc(i)
+                        val
+                    else:
+                        let val = rechtsDeel[j]
+                        inc(j)
+                        val
+            
+            if lijst[k] != v:
+                lijst[k] = v
+                inc(swaps)
+                yield k
+            inc(k)
+          
+        while i < linksDeel.len:
+            if lijst[k] != linksDeel[i]:
+                lijst[k] = linksDeel[i]
+                inc(swaps)
+                yield k
+            inc(i)
+            inc(k)
+          
+        while j < rechtsDeel.len:
+            if lijst[k] != rechtsDeel[j]:
+                lijst[k] = rechtsDeel[j]
+                inc(swaps)
+                yield k
+            inc(j)
+            inc(k)
+          
+        huidigeStart = links.start
+        eindeRun = rechts.einde
+      
+      if stack.len > 0:
+        stack[^1].power = p
+
+    stack.add((huidigeStart, eindeRun, 0))
+    huidigeStart = volgendeStart
+
+  while stack.len > 1:
+    let rechts = stack.pop()
+    let links = stack.pop()
+
+    var linksDeel = lijst[links.start..links.einde]
+    var rechtsDeel = lijst[rechts.start..rechts.einde]
+    var i = 0
+    var j = 0
+    var k = links.start
+    
+    while i < linksDeel.len and j < rechtsDeel.len:
+            inc(comparisons)
+            let v = if linksDeel[i] <= rechtsDeel[j]:
+                        let val = linksDeel[i]
+                        inc(i)
+                        val
+                    else:
+                        let val = rechtsDeel[j]
+                        inc(j)
+                        val
+            
+            if lijst[k] != v:
+                lijst[k] = v
+                inc(swaps)
+                yield k
+            inc(k)
+          
+    while i < linksDeel.len:
+        if lijst[k] != linksDeel[i]:
+            lijst[k] = linksDeel[i]
+            inc(swaps)
+            yield k
+        inc(i)
+        inc(k)
+
+    while j < rechtsDeel.len:
+        if lijst[k] != rechtsDeel[j]:
+            lijst[k] = rechtsDeel[j]
+            inc(swaps)
+            yield k
+        inc(j)
+        inc(k)
+      
+    stack.add((links.start, rechts.einde, 0))
